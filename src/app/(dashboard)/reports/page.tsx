@@ -53,7 +53,7 @@ export default function ReportsPage() {
           <div>
             <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-700">Analytics</p>
             <h1 className="mt-1 text-3xl font-black text-[#2a1309]">Sales & Performance</h1>
-            <p className="mt-2 text-sm font-semibold text-[#7a3f1d]/70">Monitor your restaurant's financial pulse in real-time.</p>
+            <p className="mt-2 text-sm font-semibold text-[#7a3f1d]/70">Monitor your restaurant&apos;s financial pulse in real-time.</p>
           </div>
           
           <div className="flex items-center gap-1 rounded-2xl bg-orange-100/50 p-1 border border-orange-200">
