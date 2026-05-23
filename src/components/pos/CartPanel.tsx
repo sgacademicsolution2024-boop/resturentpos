@@ -51,6 +51,15 @@ export function CartPanel({
       const canvas = await html2canvas(receiptRef.current, {
         scale: 2,
         backgroundColor: "#ffffff",
+        onclone: (clonedDoc) => {
+          const el = clonedDoc.getElementById("bill-receipt");
+          if (el) {
+            el.style.position = "relative";
+            el.style.left = "0";
+            el.style.top = "0";
+            el.className = el.className.replace("-left-[9999px]", "");
+          }
+        }
       });
       
       const imgData = canvas.toDataURL("image/png");
