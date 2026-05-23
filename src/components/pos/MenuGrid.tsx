@@ -59,7 +59,7 @@ export function MenuGrid({ activeCategory, search, onCategoryChange, onSearchCha
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 min-[520px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
         {filtered.map((item) => (
           <MenuItemCard key={item.id} item={item} onAdd={onAdd} />
         ))}
