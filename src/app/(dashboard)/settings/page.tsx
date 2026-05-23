@@ -5,13 +5,16 @@ import { Check, Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { restaurant } from "@/lib/constants";
+import { useSettings } from "@/lib/settings-context";
 import { RoleGate } from "@/components/auth/RoleGate";
 
 export default function SettingsPage() {
+  const { restaurantData, updateRestaurantData } = useSettings();
   const [isSaved, setIsSaved] = useState(false);
+  const [formData, setFormData] = useState(restaurantData);
 
   const handleSave = () => {
+    updateRestaurantData(formData);
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
   };
@@ -33,24 +36,24 @@ export default function SettingsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2">
                 <span className="text-sm font-bold text-[#4a2311]">Restaurant Name</span>
-                <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.name} />
+                <Input className="h-12 rounded-2xl bg-white" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
               </label>
               <label className="space-y-2">
                 <span className="text-sm font-bold text-[#4a2311]">Phone Number</span>
-                <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.phone} />
+                <Input className="h-12 rounded-2xl bg-white" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
               </label>
               <label className="space-y-2">
                 <span className="text-sm font-bold text-[#4a2311]">Currency Symbol</span>
-                <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.currency} />
+                <Input className="h-12 rounded-2xl bg-white" value={formData.currency} onChange={(e) => setFormData({ ...formData, currency: e.target.value })} />
               </label>
               <label className="space-y-2">
                 <span className="text-sm font-bold text-[#4a2311]">Tax Rate (%)</span>
-                <Input className="h-12 rounded-2xl bg-white" type="number" defaultValue={restaurant.taxRate} />
+                <Input className="h-12 rounded-2xl bg-white" type="number" value={formData.taxRate} onChange={(e) => setFormData({ ...formData, taxRate: Number(e.target.value) })} />
               </label>
             </div>
             <label className="space-y-2 block">
               <span className="text-sm font-bold text-[#4a2311]">Address</span>
-              <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.address} />
+              <Input className="h-12 rounded-2xl bg-white" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
             </label>
             <div className="pt-2 flex items-center gap-4">
               <Button onClick={handleSave} className="min-h-14 text-base min-w-[160px]">

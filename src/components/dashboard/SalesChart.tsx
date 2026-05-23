@@ -2,10 +2,12 @@
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { restaurant, salesTrend } from "@/lib/constants";
+import { salesTrend } from "@/lib/constants";
 import { money } from "@/lib/utils/billing";
+import { useSettings } from "@/lib/settings-context";
 
 export function SalesChart() {
+  const { restaurantData } = useSettings();
   return (
     <Card className="overflow-hidden bg-white/85">
       <CardHeader>
@@ -21,12 +23,12 @@ export function SalesChart() {
               stroke="#7c3a18"
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `${restaurant.currency}${Number(value) / 1000}k`}
+              tickFormatter={(value) => `${restaurantData.currency}${Number(value) / 1000}k`}
             />
             <Tooltip
               cursor={{ fill: "rgba(251, 146, 60, 0.12)" }}
               formatter={(value: number, name) =>
-                [money(value, restaurant.currency), name === "sales" ? "Sales" : name]
+                [money(value, restaurantData.currency), name === "sales" ? "Sales" : name]
               }
               contentStyle={{
                 borderRadius: 18,

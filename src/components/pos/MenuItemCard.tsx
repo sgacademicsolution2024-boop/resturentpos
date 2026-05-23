@@ -2,7 +2,7 @@ import { Clock, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { MenuItem } from "@/lib/types";
 import { money } from "@/lib/utils/billing";
-import { restaurant } from "@/lib/constants";
+import { useSettings } from "@/lib/settings-context";
 
 type MenuItemCardProps = {
   item: MenuItem;
@@ -10,6 +10,7 @@ type MenuItemCardProps = {
 };
 
 export function MenuItemCard({ item, onAdd }: MenuItemCardProps) {
+  const { restaurantData } = useSettings();
   return (
     <article className={`food-card-shadow relative flex min-h-[140px] min-w-0 flex-col justify-between overflow-hidden rounded-[1.25rem] border border-white/80 bg-gradient-to-br ${item.color} p-3 transition hover:-translate-y-1 hover:shadow-md`}>
       
@@ -33,7 +34,7 @@ export function MenuItemCard({ item, onAdd }: MenuItemCardProps) {
             <Clock className="h-3 w-3" />
             {item.prepMinutes}m
           </p>
-          <p className="text-lg font-black tracking-tight text-[#2a1309] whitespace-nowrap">{money(item.sellingPrice, restaurant.currency)}</p>
+          <p className="text-lg font-black tracking-tight text-[#2a1309] whitespace-nowrap">{money(item.sellingPrice, restaurantData.currency)}</p>
         </div>
         <Button size="sm" disabled={!item.available} onClick={() => onAdd(item)} className="w-full h-8 text-xs rounded-lg shadow-sm shrink-0">
           <PlusCircle className="mr-1.5 h-3.5 w-3.5" />

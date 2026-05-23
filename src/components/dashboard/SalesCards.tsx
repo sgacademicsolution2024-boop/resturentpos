@@ -1,17 +1,19 @@
 import { Crown, IndianRupee } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/Card";
-import { restaurant, salesTrend } from "@/lib/constants";
+import { salesTrend } from "@/lib/constants";
 import { money } from "@/lib/utils/billing";
+import { useSettings } from "@/lib/settings-context";
 
 export function SalesCards() {
+  const { restaurantData } = useSettings();
   const today = salesTrend.at(-1) ?? { sales: 0, profit: 0, orders: 0 };
   const weeklySales = salesTrend.reduce((sum, day) => sum + day.sales, 0);
   const monthlySales = weeklySales * 4;
 
   const cards = [
-    { label: "Today Sales", value: money(today.sales, restaurant.currency), icon: IndianRupee, tone: "from-orange-500 to-red-500" },
-    { label: "Weekly Sales", value: money(weeklySales, restaurant.currency), icon: IndianRupee, tone: "from-orange-500 to-red-500" },
-    { label: "Monthly Sales", value: money(monthlySales, restaurant.currency), icon: Crown, tone: "from-yellow-400 to-orange-500" },
+    { label: "Today Sales", value: money(today.sales, restaurantData.currency), icon: IndianRupee, tone: "from-orange-500 to-red-500" },
+    { label: "Weekly Sales", value: money(weeklySales, restaurantData.currency), icon: IndianRupee, tone: "from-orange-500 to-red-500" },
+    { label: "Monthly Sales", value: money(monthlySales, restaurantData.currency), icon: Crown, tone: "from-yellow-400 to-orange-500" },
   ];
 
   return (

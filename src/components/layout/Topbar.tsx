@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { LogOut, Menu, Settings, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { restaurant } from "@/lib/constants";
+import { useSettings } from "@/lib/settings-context";
 import { useAuth, Role } from "@/lib/auth-context";
 
 type TopbarProps = {
@@ -11,6 +11,7 @@ type TopbarProps = {
 };
 
 export function Topbar({ onMenuClick }: TopbarProps) {
+  const { restaurantData } = useSettings();
   const { role, setRole, currentUser } = useAuth();
   const now = new Intl.DateTimeFormat("en-IN", {
     weekday: "short",
@@ -29,7 +30,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           </Button>
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-700">Live restaurant desk</p>
-            <h1 className="text-xl font-black tracking-tight text-[#2a1309] md:text-2xl">{restaurant.name}</h1>
+            <h1 className="text-xl font-black tracking-tight text-[#2a1309] md:text-2xl">{restaurantData.name}</h1>
           </div>
         </div>
 

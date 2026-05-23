@@ -1,7 +1,8 @@
 import { forwardRef } from "react";
 import type { CartItem, PaymentMethod } from "@/lib/types";
 import { money } from "@/lib/utils/billing";
-import { restaurant, cashier } from "@/lib/constants";
+import { cashier } from "@/lib/constants";
+import { useSettings } from "@/lib/settings-context";
 
 type BillReceiptProps = {
   cart: CartItem[];
@@ -13,6 +14,7 @@ type BillReceiptProps = {
 
 export const BillReceipt = forwardRef<HTMLDivElement, BillReceiptProps>(
   ({ cart, discount, totals, billNumber, paymentMethod }, ref) => {
+    const { restaurantData } = useSettings();
     const date = new Date();
 
     return (
@@ -22,9 +24,9 @@ export const BillReceipt = forwardRef<HTMLDivElement, BillReceiptProps>(
         className="fixed -left-[9999px] top-0 w-[300px] bg-white p-4 font-mono text-sm text-black print:static print:w-full print:block"
       >
         <div className="text-center mb-4">
-          <h1 className="text-xl font-bold uppercase">{restaurant.name}</h1>
-          <p className="text-xs">{restaurant.address}</p>
-          <p className="text-xs">Ph: {restaurant.phone}</p>
+          <h1 className="text-xl font-bold uppercase">{restaurantData.name}</h1>
+          <p className="text-xs">{restaurantData.address}</p>
+          <p className="text-xs">Ph: {restaurantData.phone}</p>
         </div>
 
         <div className="text-center mb-4 border-b border-black pb-2 border-dashed">
@@ -63,12 +65,12 @@ export const BillReceipt = forwardRef<HTMLDivElement, BillReceiptProps>(
                   {item.menuItem.name}
                   <br />
                   <span className="text-[10px] text-gray-500">
-                    @{money(item.sellingPriceSnapshot, restaurant.currency)}
+                    @{money(item.sellingPriceSnapshot, restaurantData.currency)}
                   </span>
                 </td>
                 <td className="text-center py-1">{item.quantity}</td>
                 <td className="text-right py-1">
-                  {money(item.sellingPriceSnapshot * item.quantity, restaurant.currency)}
+                  {money(item.sellingPriceSnapshot * item.quantity, restaurantData.currency)}
                 </td>
               </tr>
             ))}
@@ -78,21 +80,21 @@ export const BillReceipt = forwardRef<HTMLDivElement, BillReceiptProps>(
         <div className="border-t border-black border-dashed pt-2 mb-4 text-xs space-y-1">
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>{money(totals.subtotal, restaurant.currency)}</span>
+            <span>{money(totals.subtotal, restaurantData.currency)}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between">
               <span>Discount</span>
-              <span>-{money(discount, restaurant.currency)}</span>
+              <span>-{money(discount, restaurantData.currency)}</span>
             </div>
           )}
           <div className="flex justify-between">
-            <span>Tax ({restaurant.taxRate}%)</span>
-            <span>{money(totals.tax, restaurant.currency)}</span>
+            <span>Tax ({restaurantData.taxRate}%)</span>
+            <span>{money(totals.tax, restaurantData.currency)}</span>
           </div>
           <div className="flex justify-between font-bold text-base mt-2 border-t border-black pt-2">
             <span>GRAND TOTAL</span>
-            <span>{money(totals.total, restaurant.currency)}</span>
+            <span>{money(totals.total, restaurantData.currency)}</span>
           </div>
         </div>
 

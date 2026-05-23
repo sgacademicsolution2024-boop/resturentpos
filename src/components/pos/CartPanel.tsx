@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { PaymentPanel } from "@/components/pos/PaymentPanel";
 import { BillReceipt } from "@/components/pos/BillReceipt";
-import { cashier, restaurant } from "@/lib/constants";
+import { cashier } from "@/lib/constants";
+import { useSettings } from "@/lib/settings-context";
 import type { CartItem, PaymentMethod } from "@/lib/types";
 import { calculateBill, money, buildBillNumber } from "@/lib/utils/billing";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,8 @@ export function CartPanel({
   className,
   hideHeader
 }: CartPanelProps) {
-  const totals = calculateBill(cart, discount, restaurant.taxRate);
+  const { restaurantData } = useSettings();
+  const totals = calculateBill(cart, discount, restaurantData.taxRate);
   const receiptRef = useRef<HTMLDivElement>(null);
   
   const billNumber = useMemo(() => buildBillNumber("GFK"), []);
@@ -122,7 +124,7 @@ export function CartPanel({
                   <div>
                     <p className="font-black text-[#2a1309]">{item.menuItem.name}</p>
                     <p className="text-sm font-bold text-[#7a3f1d]/70">
-                      {money(item.sellingPriceSnapshot, restaurant.currency)} each
+                      {money(item.sellingPriceSnapshot, restaurantData.currency)} each
                     </p>
                   </div>
                   <button
@@ -145,7 +147,7 @@ export function CartPanel({
                     </Button>
                   </div>
                   <p className="text-lg font-black text-[#2a1309]">
-                    {money(item.sellingPriceSnapshot * item.quantity, restaurant.currency)}
+                    {money(item.sellingPriceSnapshot * item.quantity, restaurantData.currency)}
                   </p>
                 </div>
               </div>
@@ -157,7 +159,7 @@ export function CartPanel({
           <div className="space-y-2 sm:space-y-3 rounded-3xl bg-orange-100/80 p-3 sm:p-4 text-sm font-bold text-[#4a2311]">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>{money(totals.subtotal, restaurant.currency)}</span>
+              <span>{money(totals.subtotal, restaurantData.currency)}</span>
             </div>
             <label className="flex items-center justify-between gap-3">
               <span>Discount</span>
@@ -170,12 +172,12 @@ export function CartPanel({
               />
             </label>
             <div className="flex justify-between">
-              <span>Tax ({restaurant.taxRate}%)</span>
-              <span>{money(totals.tax, restaurant.currency)}</span>
+              <span>Tax ({restaurantData.taxRate}%)</span>
+              <span>{money(totals.tax, restaurantData.currency)}</span>
             </div>
             <div className="flex justify-between border-t border-orange-300 pt-2 sm:pt-3 text-xl sm:text-2xl font-black">
               <span>Total</span>
-              <span>{money(totals.total, restaurant.currency)}</span>
+              <span>{money(totals.total, restaurantData.currency)}</span>
             </div>
           </div>
 

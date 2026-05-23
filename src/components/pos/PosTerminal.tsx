@@ -7,7 +7,7 @@ import { CartPanel } from "@/components/pos/CartPanel";
 import { MenuGrid } from "@/components/pos/MenuGrid";
 import type { CartItem, MenuItem, PaymentMethod } from "@/lib/types";
 import { calculateBill, money } from "@/lib/utils/billing";
-import { restaurant } from "@/lib/constants";
+import { useSettings } from "@/lib/settings-context";
 
 export function PosTerminal() {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -17,7 +17,8 @@ export function PosTerminal() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [message, setMessage] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
-  const totals = calculateBill(cart, discount, restaurant.taxRate);
+  const { restaurantData } = useSettings();
+  const totals = calculateBill(cart, discount, restaurantData.taxRate);
 
   function addItem(menuItem: MenuItem) {
     setMessage("");
@@ -55,7 +56,7 @@ export function PosTerminal() {
     setDiscount(0);
     setCartOpen(false);
     setMessage(
-      `Demo order completed with ${paymentMethod.toUpperCase()} payment. Gross profit: ${money(totals.grossProfit, restaurant.currency)}.`
+      `Demo order completed with ${paymentMethod.toUpperCase()} payment. Gross profit: ${money(totals.grossProfit, restaurantData.currency)}.`
     );
   }
 
@@ -114,7 +115,7 @@ export function PosTerminal() {
         <div className="mx-auto flex max-w-xl items-center justify-between gap-3">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.14em] text-orange-700">{cart.length} items</p>
-            <p className="text-xl font-black text-[#2a1309]">{money(totals.total, restaurant.currency)}</p>
+            <p className="text-xl font-black text-[#2a1309]">{money(totals.total, restaurantData.currency)}</p>
           </div>
           <Button size="lg" className="min-h-14 min-w-[140px] shadow-lg shadow-orange-900/20" onClick={() => setCartOpen(true)}>
             <ShoppingCart className="h-5 w-5 mr-2" />
