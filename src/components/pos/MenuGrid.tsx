@@ -42,7 +42,7 @@ export function MenuGrid({ activeCategory, search, onCategoryChange, onSearchCha
           </label>
         </div>
 
-        <div className="mt-4 flex gap-2 overflow-x-auto scroll-smooth pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="mt-4 flex gap-2 overflow-x-auto scroll-smooth pb-3">
           {menuCategories.map((category) => (
             <button
               key={category.id}
