@@ -36,7 +36,7 @@ import { rolePermissions } from "@/lib/constants";
 
 export function Sidebar({ onNavigate }: SidebarProps) {
   const pathname = usePathname();
-  const { role } = useAuth();
+  const { role, setRole } = useAuth();
   
   const allowedPaths = rolePermissions[role].map(p => `/${p}`);
 
@@ -78,9 +78,27 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           })}
       </nav>
 
-      <div className="m-4 rounded-3xl border border-white/10 bg-white/8 p-4">
-        <p className="text-sm font-black text-white">Dinner Rush</p>
-        <p className="mt-1 text-xs leading-5 text-orange-100/65">Fast billing, clear costing, and profit alerts in one warm workspace.</p>
+      <div className="m-4 space-y-4">
+        <div className="flex flex-col gap-2 rounded-2xl border border-orange-500/30 bg-orange-950/40 p-3 shadow-inner">
+          <label className="text-[10px] font-black uppercase text-orange-400">Simulate Login Role:</label>
+          <select
+            className="w-full rounded-xl bg-orange-900/50 px-3 py-2 text-sm font-bold text-white outline-none ring-1 ring-white/10 focus:ring-orange-500"
+            value={role}
+            onChange={(e) => {
+              setRole(e.target.value as any);
+              if (onNavigate) onNavigate();
+            }}
+          >
+            <option value="owner">Owner</option>
+            <option value="manager">Manager</option>
+            <option value="cashier">Cashier</option>
+          </select>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-white/8 p-4">
+          <p className="text-sm font-black text-white">Dinner Rush</p>
+          <p className="mt-1 text-xs leading-5 text-orange-100/65">Fast billing, clear costing, and profit alerts in one warm workspace.</p>
+        </div>
       </div>
     </aside>
   );
