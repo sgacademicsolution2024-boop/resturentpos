@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -12,6 +12,10 @@ export default function SettingsPage() {
   const { restaurantData, updateRestaurantData } = useSettings();
   const [isSaved, setIsSaved] = useState(false);
   const [formData, setFormData] = useState(restaurantData);
+
+  useEffect(() => {
+    setFormData(restaurantData);
+  }, [restaurantData]);
 
   const handleSave = () => {
     updateRestaurantData(formData);
