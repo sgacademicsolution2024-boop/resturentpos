@@ -1,6 +1,7 @@
 "use client";
 
-import { Save } from "lucide-react";
+import { useState } from "react";
+import { Check, Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -8,6 +9,13 @@ import { restaurant } from "@/lib/constants";
 import { RoleGate } from "@/components/auth/RoleGate";
 
 export default function SettingsPage() {
+  const [isSaved, setIsSaved] = useState(false);
+
+  const handleSave = () => {
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 3000);
+  };
+
   return (
     <RoleGate allowedRoles={["owner", "manager"]}>
       <div className="space-y-5">
@@ -23,16 +31,34 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.name} />
-              <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.phone} />
-              <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.currency} />
-              <Input className="h-12 rounded-2xl bg-white" type="number" defaultValue={restaurant.taxRate} />
+              <label className="space-y-2">
+                <span className="text-sm font-bold text-[#4a2311]">Restaurant Name</span>
+                <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.name} />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-bold text-[#4a2311]">Phone Number</span>
+                <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.phone} />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-bold text-[#4a2311]">Currency Symbol</span>
+                <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.currency} />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-bold text-[#4a2311]">Tax Rate (%)</span>
+                <Input className="h-12 rounded-2xl bg-white" type="number" defaultValue={restaurant.taxRate} />
+              </label>
             </div>
-            <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.address} />
-            <Button className="min-h-14 text-base">
-              <Save className="h-5 w-5" />
-              Save settings
-            </Button>
+            <label className="space-y-2 block">
+              <span className="text-sm font-bold text-[#4a2311]">Address</span>
+              <Input className="h-12 rounded-2xl bg-white" defaultValue={restaurant.address} />
+            </label>
+            <div className="pt-2 flex items-center gap-4">
+              <Button onClick={handleSave} className="min-h-14 text-base min-w-[160px]">
+                {isSaved ? <Check className="h-5 w-5 mr-2" /> : <Save className="h-5 w-5 mr-2" />}
+                {isSaved ? "Saved!" : "Save settings"}
+              </Button>
+              {isSaved && <span className="text-sm font-bold text-green-600">Settings updated successfully!</span>}
+            </div>
           </CardContent>
         </Card>
       </div>
