@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 34 86% 94%;
+  --foreground: 22 36% 12%;
+  --card: 38 100% 98%;
+  --card-foreground: 22 36% 12%;
+  --primary: 18 91% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 42 96% 88%;
+  --secondary-foreground: 24 54% 18%;
+  --muted: 33 56% 89%;
+  --muted-foreground: 23 18% 38%;
+  --accent: 42 96% 55%;
+  --accent-foreground: 22 36% 12%;
+  --destructive: 0 78% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 28 52% 80%;
+  --input: 28 52% 80%;
+  --ring: 18 91% 50%;
+  --radius: 1.25rem;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  background:
+    radial-gradient(circle at top left, rgba(255, 193, 7, 0.38), transparent 30rem),
+    radial-gradient(circle at top right, rgba(239, 68, 68, 0.18), transparent 28rem),
+    linear-gradient(135deg, #fff7dc 0%, #ffe5bd 45%, #fff3e0 100%);
+}
+
+::selection {
+  background: hsl(var(--primary) / 0.18);
+}
+
+.glass-panel {
+  background: rgba(255, 251, 235, 0.82);
+  backdrop-filter: blur(18px);
+}
+
+.soft-shadow {
+  box-shadow: 0 24px 60px rgba(83, 35, 8, 0.14);
+}
+
+.food-card-shadow {
+  box-shadow: 0 18px 35px rgba(194, 65, 12, 0.16);
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #bill-receipt, #bill-receipt * {
+    visibility: visible;
+  }
+
+  #bill-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    margin: 0;
+    padding: 0;
+  }
+
+  @page {
+    margin: 0;
+  }
+}
