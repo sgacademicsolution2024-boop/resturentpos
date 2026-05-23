@@ -31,7 +31,7 @@ type SidebarProps = {
   onNavigate?: () => void;
 };
 
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, Role } from "@/lib/auth-context";
 import { rolePermissions } from "@/lib/constants";
 
 export function Sidebar({ onNavigate }: SidebarProps) {
@@ -85,7 +85,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             className="w-full rounded-xl bg-orange-900/50 px-3 py-2 text-sm font-bold text-white outline-none ring-1 ring-white/10 focus:ring-orange-500"
             value={role}
             onChange={(e) => {
-              setRole(e.target.value as any);
+              setRole(e.target.value as Role);
               if (onNavigate) onNavigate();
             }}
           >

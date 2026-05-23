@@ -20,7 +20,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     if (saved) {
       try {
         setRestaurantData(JSON.parse(saved));
-      } catch (e) {}
+      } catch {
+        // Fallback to default
+      }
     }
   }, []);
 
