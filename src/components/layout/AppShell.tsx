@@ -33,8 +33,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       ) : null}
 
       <Topbar onMenuClick={() => setOpen(true)} />
-      <main className="lg:ml-[240px]">
-        <div className="mx-auto max-w-[1600px] p-4 md:p-6 lg:p-8">{children}</div>
+      <main className="lg:ml-[240px] min-w-0 w-full max-w-full">
+        <div className="mx-auto max-w-[1600px] p-4 md:p-6 lg:p-8 min-w-0 w-full max-w-full">{children}</div>
       </main>
     </div>
   );

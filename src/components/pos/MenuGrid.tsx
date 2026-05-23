@@ -24,7 +24,7 @@ export function MenuGrid({ activeCategory, search, onCategoryChange, onSearchCha
   });
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-5 min-w-0 w-full">
       <div className="rounded-[2rem] border border-orange-200/70 bg-white/75 p-4 soft-shadow">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div>
@@ -42,7 +42,7 @@ export function MenuGrid({ activeCategory, search, onCategoryChange, onSearchCha
           </label>
         </div>
 
-        <div className="mt-4 flex gap-2 overflow-x-auto scroll-smooth pb-3">
+        <div className="mt-4 flex gap-2 overflow-x-auto scroll-smooth pb-3 w-full">
           {menuCategories.map((category) => (
             <button
               key={category.id}

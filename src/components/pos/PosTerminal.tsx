@@ -60,7 +60,7 @@ export function PosTerminal() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden space-y-5 pb-5">
+    <div className="min-h-screen overflow-x-hidden space-y-5 pb-5 w-full max-w-full">
       <section className="overflow-hidden rounded-[2rem] border border-orange-300/70 bg-[#2a1309] text-white soft-shadow">
         <div className="grid gap-5 p-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
@@ -87,7 +87,7 @@ export function PosTerminal() {
         </div>
       ) : null}
 
-      <div className="grid gap-5 pb-28 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start xl:pb-0">
+      <div className="grid gap-5 pb-28 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start xl:pb-0 min-w-0 w-full">
         <MenuGrid
           activeCategory={activeCategory}
           search={search}
