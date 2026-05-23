@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role>("owner");
 
   const users: Record<Role, User> = {
-    owner: { name: "Restaurant Owner", role: "owner" },
+    owner: { name: "Bapi", role: "owner" },
     manager: { name: "Restaurant Manager", role: "manager" },
     cashier: { name: "Ayesha", role: "cashier" }
   };

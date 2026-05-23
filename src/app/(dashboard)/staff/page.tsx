@@ -8,7 +8,7 @@ import { Select } from "@/components/ui/Select";
 import { RoleGate } from "@/components/auth/RoleGate";
 
 const staff = [
-  { name: "Gourab Khan", email: "owner@gaanfunkhaan.in", role: "owner" },
+  { name: "Bapi", email: "owner@gaanfunkhaan.in", role: "owner" },
   { name: "Rahul Das", email: "manager@gaanfunkhaan.in", role: "manager" },
   { name: "Ayesha Ali", email: "cashier@gaanfunkhaan.in", role: "cashier" }
 ];
