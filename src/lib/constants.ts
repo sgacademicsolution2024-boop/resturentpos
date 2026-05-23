@@ -259,3 +259,10 @@ export const salesTrend: SalesPoint[] = [
   { day: "Sat", sales: 38420, profit: 18120, orders: 171 },
   { day: "Sun", sales: 29750, profit: 13380, orders: 132 }
 ];
+
+export const topSellingItems = [
+  { id: "item-biryani", name: "Chicken Biryani", quantitySold: 342, revenue: 75240 },
+  { id: "item-wings", name: "Chicken Wings Plate", quantitySold: 215, revenue: 38700 },
+  { id: "item-chilli", name: "Chilli Chicken", quantitySold: 198, revenue: 37620 },
+  { id: "item-rice", name: "Fried Rice", quantitySold: 185, revenue: 29600 },
+];

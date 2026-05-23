@@ -3,10 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { SalesCards } from "@/components/dashboard/SalesCards";
 import { SalesChart } from "@/components/dashboard/SalesChart";
-import { inventoryItems, recentOrders, restaurant } from "@/lib/constants";
+import { TopSellingItems } from "@/components/dashboard/TopSellingItems";
+import { inventoryItems, recentOrders } from "@/lib/constants";
 import { money } from "@/lib/utils/billing";
+import { useSettings } from "@/lib/settings-context";
 
 export function ManagerSalesDashboard() {
+  const { restaurantData } = useSettings();
   const lowStock = inventoryItems.filter((item) => item.quantityOnHand <= item.reorderLevel);
 
   return (
@@ -57,7 +60,7 @@ export function ManagerSalesDashboard() {
                 <div key={order.id} className="rounded-3xl border border-orange-200 bg-orange-50/60 p-4 text-sm">
                   <div className="flex justify-between gap-4">
                     <span className="font-black text-[#2a1309]">{order.billNumber}</span>
-                    <span className="font-black text-orange-700">{money(order.total, restaurant.currency)}</span>
+                    <span className="font-black text-orange-700">{money(order.total, restaurantData.currency)}</span>
                   </div>
                   <p className="mt-1 font-semibold text-[#7a3f1d]/70">
                     {order.paymentMethod.toUpperCase()} by {order.cashierName}
@@ -66,6 +69,7 @@ export function ManagerSalesDashboard() {
               ))}
             </CardContent>
           </Card>
+          <TopSellingItems />
         </div>
       </div>
     </div>
