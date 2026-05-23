@@ -21,6 +21,7 @@ type CartPanelProps = {
   onRemove: (id: string) => void;
   onComplete: () => void;
   className?: string;
+  hideHeader?: boolean;
 };
 
 export function CartPanel({
@@ -32,7 +33,8 @@ export function CartPanel({
   onQuantityChange,
   onRemove,
   onComplete,
-  className
+  className,
+  hideHeader
 }: CartPanelProps) {
   const totals = calculateBill(cart, discount, restaurant.taxRate);
   const receiptRef = useRef<HTMLDivElement>(null);
@@ -83,18 +85,20 @@ export function CartPanel({
   }
   return (
     <Card className={cn("flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border-orange-300/80 bg-[#fff8e7]", className)}>
-      <CardHeader className="bg-[#2a1309] text-white shrink-0">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-200">Current bill</p>
-            <CardTitle className="mt-1 text-2xl">Table Order</CardTitle>
+      {!hideHeader && (
+        <CardHeader className="bg-[#2a1309] text-white shrink-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-200">Current bill</p>
+              <CardTitle className="mt-1 text-2xl">Table Order</CardTitle>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500">
+              <ReceiptText className="h-6 w-6" />
+            </div>
           </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500">
-            <ReceiptText className="h-6 w-6" />
-          </div>
-        </div>
-        <p className="pt-2 text-sm font-semibold text-orange-100/70">Cashier: {cashier.name}</p>
-      </CardHeader>
+          <p className="pt-2 text-sm font-semibold text-orange-100/70">Cashier: {cashier.name}</p>
+        </CardHeader>
+      )}
       <CardContent className="flex flex-1 flex-col p-0 min-h-0">
         <div className="flex-1 overflow-y-auto p-5 space-y-3">
           {cart.length === 0 ? (
@@ -140,8 +144,8 @@ export function CartPanel({
           )}
         </div>
 
-        <div className="shrink-0 border-t border-orange-300/30 bg-[#fff8e7] p-5 space-y-4">
-          <div className="space-y-3 rounded-3xl bg-orange-100/80 p-4 text-sm font-bold text-[#4a2311]">
+        <div className="shrink-0 border-t border-orange-300/30 bg-[#fff8e7] p-3 sm:p-5 space-y-3 sm:space-y-4">
+          <div className="space-y-2 sm:space-y-3 rounded-3xl bg-orange-100/80 p-3 sm:p-4 text-sm font-bold text-[#4a2311]">
             <div className="flex justify-between">
               <span>Subtotal</span>
               <span>{money(totals.subtotal, restaurant.currency)}</span>
@@ -149,7 +153,7 @@ export function CartPanel({
             <label className="flex items-center justify-between gap-3">
               <span>Discount</span>
               <input
-                className="h-11 w-28 rounded-2xl border border-orange-200 bg-white px-3 text-right text-base font-black outline-none focus:ring-2 focus:ring-orange-500"
+                className="h-9 sm:h-11 w-24 sm:w-28 rounded-2xl border border-orange-200 bg-white px-3 text-right text-base font-black outline-none focus:ring-2 focus:ring-orange-500"
                 type="number"
                 min={0}
                 value={discount}
@@ -160,7 +164,7 @@ export function CartPanel({
               <span>Tax ({restaurant.taxRate}%)</span>
               <span>{money(totals.tax, restaurant.currency)}</span>
             </div>
-            <div className="flex justify-between border-t border-orange-300 pt-3 text-2xl font-black">
+            <div className="flex justify-between border-t border-orange-300 pt-2 sm:pt-3 text-xl sm:text-2xl font-black">
               <span>Total</span>
               <span>{money(totals.total, restaurant.currency)}</span>
             </div>
@@ -171,7 +175,7 @@ export function CartPanel({
           <div className="grid grid-cols-2 gap-2">
             <Button 
               size="lg" 
-              className="col-span-2 min-h-14" 
+              className="col-span-2 min-h-12 sm:min-h-14 text-base sm:text-lg" 
               disabled={cart.length === 0 || !paymentMethod} 
               onClick={onComplete}
             >
@@ -180,21 +184,21 @@ export function CartPanel({
             <Button 
               variant="secondary" 
               size="lg" 
-              className="min-h-14" 
+              className="min-h-12 sm:min-h-14 text-sm sm:text-base" 
               disabled={cart.length === 0} 
               onClick={() => window.print()}
             >
-              <Printer className="h-5 w-5 mr-2" />
+              <Printer className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Print
             </Button>
             <Button 
               variant="secondary" 
               size="lg" 
-              className="min-h-14" 
+              className="min-h-12 sm:min-h-14 text-sm sm:text-base" 
               disabled={cart.length === 0} 
               onClick={downloadReceipt}
             >
-              <Download className="h-5 w-5 mr-2" />
+              <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Download
             </Button>
           </div>

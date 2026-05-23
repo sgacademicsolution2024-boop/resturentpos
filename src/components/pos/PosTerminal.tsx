@@ -124,28 +124,29 @@ export function PosTerminal() {
       </div>
 
       {cartOpen ? (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-sm transition-opacity xl:hidden">
-          <button className="absolute inset-0 h-full w-full cursor-default" type="button" onClick={() => setCartOpen(false)} aria-label="Close cart" />
-          <div className="relative mt-24 flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-[2.5rem] bg-[#fff8e7] shadow-2xl animate-in slide-in-from-bottom-full duration-300">
-            <div className="flex shrink-0 items-center justify-between border-b border-orange-200/60 p-5">
-              <h2 className="text-xl font-black text-[#2a1309]">Your Order</h2>
-              <Button variant="secondary" size="icon" className="rounded-full bg-white shadow-sm" onClick={() => setCartOpen(false)} aria-label="Close cart">
-                <X className="h-5 w-5" />
-              </Button>
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#fff8e7] animate-in slide-in-from-bottom-full duration-300 xl:hidden">
+          <div className="flex shrink-0 items-center justify-between border-b border-orange-200/60 p-4 bg-[#2a1309] text-white">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-200">Current bill</p>
+              <h2 className="mt-1 text-xl font-black">Your Order</h2>
             </div>
-            <div className="flex flex-1 flex-col min-h-0 p-2">
-              <CartPanel
-                className="w-full h-full border-0 bg-transparent shadow-none"
-                cart={cart}
-                discount={discount}
-                paymentMethod={paymentMethod}
-                onDiscountChange={setDiscount}
-                onPaymentMethodChange={setPaymentMethod}
-                onQuantityChange={changeQuantity}
-                onRemove={(id) => setCart((current) => current.filter((item) => item.menuItem.id !== id))}
-                onComplete={completeOrder}
-              />
-            </div>
+            <Button variant="secondary" size="icon" className="rounded-full bg-white/10 text-white hover:bg-white/20 border-0" onClick={() => setCartOpen(false)} aria-label="Close cart">
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+          <div className="flex flex-1 flex-col min-h-0">
+            <CartPanel
+              className="w-full h-full border-0 bg-transparent shadow-none rounded-none"
+              hideHeader={true}
+              cart={cart}
+              discount={discount}
+              paymentMethod={paymentMethod}
+              onDiscountChange={setDiscount}
+              onPaymentMethodChange={setPaymentMethod}
+              onQuantityChange={changeQuantity}
+              onRemove={(id) => setCart((current) => current.filter((item) => item.menuItem.id !== id))}
+              onComplete={completeOrder}
+            />
           </div>
         </div>
       ) : null}
