@@ -36,6 +36,7 @@ export type MenuItem = {
   imageLabel: string;
   prepMinutes: number;
   color: string;
+  is_favorite?: boolean;
 };
 
 export type InventoryItem = {

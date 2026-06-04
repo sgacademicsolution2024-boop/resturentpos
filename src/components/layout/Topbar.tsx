@@ -4,7 +4,8 @@ import Link from "next/link";
 import { LogOut, Menu, Settings, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useSettings } from "@/lib/settings-context";
-import { useAuth, Role } from "@/lib/auth-context";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 
 type TopbarProps = {
   onMenuClick: () => void;
@@ -12,7 +13,8 @@ type TopbarProps = {
 
 export function Topbar({ onMenuClick }: TopbarProps) {
   const { restaurantData } = useSettings();
-  const { role, setRole, currentUser } = useAuth();
+  const { currentUser, signOut } = useAuth();
+  const router = useRouter();
   const now = new Intl.DateTimeFormat("en-IN", {
     weekday: "short",
     day: "2-digit",
@@ -21,56 +23,50 @@ export function Topbar({ onMenuClick }: TopbarProps) {
     minute: "2-digit"
   }).format(new Date());
 
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/login");
+  };
+
   return (
-    <header className="sticky top-0 z-30 border-b border-orange-200/70 glass-panel lg:ml-[240px]">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white lg:ml-[240px]">
       <div className="flex min-h-20 items-center justify-between gap-3 px-4 md:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="bg-white/70 lg:hidden" onClick={onMenuClick} aria-label="Open menu">
+          <Button variant="ghost" size="icon" className="bg-slate-100 text-slate-700 min-h-[48px] lg:hidden" onClick={onMenuClick} aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </Button>
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-700">Live restaurant desk</p>
-            <h1 className="text-xl font-black tracking-tight text-[#2a1309] md:text-2xl">{restaurantData.name}</h1>
+            <p className="text-xs font-bold uppercase tracking-widest text-blue-600">Live restaurant desk</p>
+            <h1 className="text-xl font-black tracking-tight text-slate-900 md:text-2xl">{restaurantData.name}</h1>
           </div>
         </div>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <div className="flex items-center gap-2 rounded-2xl border border-orange-200 bg-orange-50/50 px-3 py-1.5 shadow-sm">
-            <span className="text-[10px] font-black uppercase text-orange-700">Dev Role:</span>
-            <select
-              className="bg-transparent text-sm font-bold text-[#3b1c0f] outline-none cursor-pointer"
-              value={role}
-              onChange={(e) => setRole(e.target.value as Role)}
-            >
-              <option value="owner">Owner</option>
-              <option value="manager">Manager</option>
-              <option value="cashier">Cashier</option>
-            </select>
-          </div>
-
-          <div className="rounded-2xl bg-white/75 px-4 py-2 text-sm font-bold text-[#3b1c0f] shadow-sm">
+          <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm flex items-center min-h-[48px]">
             {now}
           </div>
-          <div className="rounded-2xl bg-[#2a1309] px-4 py-2 text-sm font-bold text-orange-50">
-            {currentUser.name}
-          </div>
+          {currentUser && (
+            <div className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow flex items-center min-h-[48px]">
+              {currentUser.full_name}
+            </div>
+          )}
           <Link href="/dashboard">
-            <Button variant="secondary">
-              <ShoppingBag className="h-4 w-4" />
+            <Button variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 min-h-[48px]">
+              <ShoppingBag className="h-4 w-4 mr-2" />
               Dashboard
             </Button>
           </Link>
           <Link href="/orders">
-            <Button variant="secondary">Orders</Button>
+            <Button variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 min-h-[48px]">Orders</Button>
           </Link>
           <Link href="/settings">
-            <Button variant="ghost" className="bg-white/70">
-              <Settings className="h-4 w-4" />
+            <Button variant="ghost" className="bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 min-h-[48px]">
+              <Settings className="h-4 w-4 mr-2" />
               Settings
             </Button>
           </Link>
-          <Button variant="danger">
-            <LogOut className="h-4 w-4" />
+          <Button variant="danger" className="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 min-h-[48px]" onClick={handleLogout}>
+            <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>
         </div>

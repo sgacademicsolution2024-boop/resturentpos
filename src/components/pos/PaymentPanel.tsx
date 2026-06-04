@@ -26,8 +26,8 @@ export function PaymentPanel({ value, onChange }: PaymentPanelProps) {
             type="button"
             onClick={() => onChange(method.value)}
             className={cn(
-              "flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl border border-orange-200 bg-white text-sm font-black text-[#5c2d17] transition",
-              value === method.value && "border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-900/20"
+              "flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-600 transition hover:bg-slate-100",
+              value === method.value && "border-blue-600 bg-blue-50 text-blue-700 ring-1 ring-blue-600"
             )}
           >
             <Icon className="h-5 w-5" />

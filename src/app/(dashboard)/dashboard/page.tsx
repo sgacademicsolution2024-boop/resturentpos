@@ -2,15 +2,15 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { RoleGate } from "@/components/auth/RoleGate";
-import { OwnerProfitDashboard } from "@/components/dashboard/OwnerProfitDashboard";
+import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 import { ManagerSalesDashboard } from "@/components/dashboard/ManagerSalesDashboard";
 
 export default function DashboardPage() {
-  const { role } = useAuth();
+  const { isAdmin } = useAuth();
 
   return (
-    <RoleGate allowedRoles={["owner", "manager"]} redirectTo="/pos">
-      {role === "owner" ? <OwnerProfitDashboard /> : <ManagerSalesDashboard />}
+    <RoleGate allowedRoles={["admin", "manager"]} redirectTo="/pos">
+      {isAdmin ? <AdminDashboard /> : <ManagerSalesDashboard />}
     </RoleGate>
   );
 }

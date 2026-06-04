@@ -61,7 +61,7 @@ export const menuItems: MenuItem[] = [
     imageUrl: "",
     imageLabel: "CW",
     prepMinutes: 12,
-    color: "from-orange-100 to-red-100"
+    color: "from-slate-800 to-red-100"
   }),
   withCosting({
     id: "item-biryani",
@@ -78,7 +78,7 @@ export const menuItems: MenuItem[] = [
     imageUrl: "",
     imageLabel: "CB",
     prepMinutes: 16,
-    color: "from-amber-100 to-yellow-100"
+    color: "from-amber-100 to-slate-800"
   }),
   withCosting({
     id: "item-roll",
@@ -95,7 +95,7 @@ export const menuItems: MenuItem[] = [
     imageUrl: "",
     imageLabel: "ER",
     prepMinutes: 7,
-    color: "from-yellow-100 to-orange-100"
+    color: "from-slate-800 to-slate-800"
   }),
   withCosting({
     id: "item-rice",
@@ -112,7 +112,7 @@ export const menuItems: MenuItem[] = [
     imageUrl: "",
     imageLabel: "FR",
     prepMinutes: 11,
-    color: "from-lime-100 to-yellow-100"
+    color: "from-lime-100 to-slate-800"
   }),
   withCosting({
     id: "item-chilli",
@@ -129,7 +129,7 @@ export const menuItems: MenuItem[] = [
     imageUrl: "",
     imageLabel: "CC",
     prepMinutes: 13,
-    color: "from-red-100 to-orange-100"
+    color: "from-red-100 to-slate-800"
   }),
   withCosting({
     id: "item-coffee",
@@ -163,7 +163,7 @@ export const menuItems: MenuItem[] = [
     imageUrl: "",
     imageLabel: "MT",
     prepMinutes: 4,
-    color: "from-rose-100 to-yellow-100"
+    color: "from-rose-100 to-slate-800"
   }),
   withCosting({
     id: "item-brownie",
@@ -180,7 +180,7 @@ export const menuItems: MenuItem[] = [
     imageUrl: "",
     imageLabel: "BR",
     prepMinutes: 3,
-    color: "from-orange-100 to-stone-100"
+    color: "from-slate-800 to-stone-100"
   })
 ];
 

@@ -2,11 +2,11 @@
 
 import { useMemo, useRef } from "react";
 import { Download, Minus, Plus, Printer, ReceiptText, Trash2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { PaymentPanel } from "@/components/pos/PaymentPanel";
 import { BillReceipt } from "@/components/pos/BillReceipt";
-import { cashier } from "@/lib/constants";
 import { useSettings } from "@/lib/settings-context";
 import type { CartItem, PaymentMethod } from "@/lib/types";
 import { calculateBill, money, buildBillNumber } from "@/lib/utils/billing";
@@ -23,6 +23,8 @@ type CartPanelProps = {
   onComplete: () => void;
   className?: string;
   hideHeader?: boolean;
+  isSubmitting?: boolean;
+  cashierName: string;
 };
 
 export function CartPanel({
@@ -35,7 +37,9 @@ export function CartPanel({
   onRemove,
   onComplete,
   className,
-  hideHeader
+  hideHeader,
+  isSubmitting,
+  cashierName
 }: CartPanelProps) {
   const { restaurantData } = useSettings();
   const totals = calculateBill(cart, discount, restaurantData.taxRate);
@@ -95,76 +99,89 @@ export function CartPanel({
     }
   }
   return (
-    <Card className={cn("flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border-orange-300/80 bg-[#fff8e7]", className)}>
+    <Card className={cn("flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem]", className)}>
       {!hideHeader && (
-        <CardHeader className="bg-[#2a1309] text-white shrink-0">
+        <CardHeader className="bg-white text-slate-900 shrink-0 border-b border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-200">Current bill</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-500">Current bill</p>
               <CardTitle className="mt-1 text-2xl">Table Order</CardTitle>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-900/20">
               <ReceiptText className="h-6 w-6" />
             </div>
           </div>
-          <p className="pt-2 text-sm font-semibold text-orange-100/70">Cashier: {cashier.name}</p>
+          <p className="pt-2 text-sm font-bold text-slate-500">Cashier: {cashierName}</p>
         </CardHeader>
       )}
-      <CardContent className="flex flex-1 flex-col p-0 min-h-0">
+      <CardContent className="flex flex-1 flex-col p-0 min-h-0 bg-slate-50">
         <div className="flex-1 overflow-y-auto p-5 space-y-3">
           {cart.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-orange-300 bg-white/70 p-6 text-center">
-              <p className="text-lg font-black text-[#2a1309]">No items yet</p>
-              <p className="mt-1 text-sm font-semibold text-[#7a3f1d]/70">Tap a food card to begin billing.</p>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="rounded-2xl border border-dashed border-slate-300 bg-slate-100 p-8 text-center"
+            >
+              <p className="text-lg font-bold text-slate-700">No items yet</p>
+              <p className="mt-1 text-sm font-semibold text-slate-500">Tap a food card to begin billing.</p>
+            </motion.div>
           ) : (
-            cart.map((item) => (
-              <div key={item.menuItem.id} className="rounded-3xl border border-orange-200 bg-white p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-black text-[#2a1309]">{item.menuItem.name}</p>
-                    <p className="text-sm font-bold text-[#7a3f1d]/70">
-                      {money(item.sellingPriceSnapshot, restaurantData.currency)} each
+            <AnimatePresence>
+              {cart.map((item) => (
+                <motion.div 
+                  key={item.menuItem.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, x: -50 }}
+                  className="rounded-2xl border border-slate-200 bg-white p-3 hover:border-blue-300 hover:shadow-sm transition-all"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-bold text-slate-900">{item.menuItem.name}</p>
+                      <p className="text-sm font-bold text-slate-500">
+                        {money(item.sellingPriceSnapshot, restaurantData.currency)} each
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onRemove(item.menuItem.id)}
+                      className="rounded-xl bg-red-50 p-2 text-red-500 hover:bg-red-100 transition-colors"
+                      aria-label={`Remove ${item.menuItem.name}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Button variant="secondary" size="icon" className="h-10 w-10 min-h-[40px] bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 shadow-none" onClick={() => onQuantityChange(item.menuItem.id, -1)}>
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="min-w-[2rem] text-center text-lg font-bold text-slate-900">{item.quantity}</span>
+                      <Button variant="secondary" size="icon" className="h-10 w-10 min-h-[40px] bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 shadow-none" onClick={() => onQuantityChange(item.menuItem.id, 1)}>
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-lg font-black text-blue-600">
+                      {money(item.sellingPriceSnapshot * item.quantity, restaurantData.currency)}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => onRemove(item.menuItem.id)}
-                    className="rounded-xl bg-red-50 p-2 text-red-600"
-                    aria-label={`Remove ${item.menuItem.name}`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Button variant="secondary" size="icon" onClick={() => onQuantityChange(item.menuItem.id, -1)}>
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="min-w-8 text-center text-lg font-black">{item.quantity}</span>
-                    <Button variant="secondary" size="icon" onClick={() => onQuantityChange(item.menuItem.id, 1)}>
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <p className="text-lg font-black text-[#2a1309]">
-                    {money(item.sellingPriceSnapshot * item.quantity, restaurantData.currency)}
-                  </p>
-                </div>
-              </div>
-            ))
+                </motion.div>
+              ))}
+            </AnimatePresence>
           )}
         </div>
 
-        <div className="shrink-0 border-t border-orange-300/30 bg-[#fff8e7] p-3 sm:p-5 space-y-3 sm:space-y-4">
-          <div className="space-y-2 sm:space-y-3 rounded-3xl bg-orange-100/80 p-3 sm:p-4 text-sm font-bold text-[#4a2311]">
+        <div className="shrink-0 border-t border-slate-200 bg-white p-4 space-y-4">
+          <div className="space-y-3 rounded-2xl bg-slate-50 border border-slate-200 p-4 text-sm font-bold text-slate-600">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>{money(totals.subtotal, restaurantData.currency)}</span>
+              <span className="text-slate-900">{money(totals.subtotal, restaurantData.currency)}</span>
             </div>
             <label className="flex items-center justify-between gap-3">
               <span>Discount</span>
               <input
-                className="h-9 sm:h-11 w-24 sm:w-28 rounded-2xl border border-orange-200 bg-white px-3 text-right text-base font-black outline-none focus:ring-2 focus:ring-orange-500"
+                className="h-12 w-28 rounded-xl border border-slate-200 bg-white px-3 text-right text-base font-bold text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
                 type="number"
                 min={0}
                 value={discount}
@@ -173,43 +190,45 @@ export function CartPanel({
             </label>
             <div className="flex justify-between">
               <span>Tax ({restaurantData.taxRate}%)</span>
-              <span>{money(totals.tax, restaurantData.currency)}</span>
+              <span className="text-slate-900">{money(totals.tax, restaurantData.currency)}</span>
             </div>
-            <div className="flex justify-between border-t border-orange-300 pt-2 sm:pt-3 text-xl sm:text-2xl font-black">
+            <div className="flex justify-between border-t border-slate-200 pt-3 text-xl font-black text-slate-900">
               <span>Total</span>
-              <span>{money(totals.total, restaurantData.currency)}</span>
+              <motion.span key={totals.total} initial={{ scale: 1.1, color: "#2563eb" }} animate={{ scale: 1, color: "#0f172a" }} className="text-blue-600">
+                {money(totals.total, restaurantData.currency)}
+              </motion.span>
             </div>
           </div>
 
           <PaymentPanel value={paymentMethod} onChange={onPaymentMethodChange} />
           
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             <Button 
               size="lg" 
-              className="col-span-2 min-h-12 sm:min-h-14 text-base sm:text-lg" 
-              disabled={cart.length === 0 || !paymentMethod} 
+              className="col-span-2 min-h-[56px] text-lg bg-blue-600 hover:bg-blue-700 shadow-none" 
+              disabled={cart.length === 0 || !paymentMethod || isSubmitting} 
               onClick={onComplete}
             >
-              Complete Order
+              {isSubmitting ? "Completing..." : "Complete Order"}
             </Button>
             <Button 
               variant="secondary" 
               size="lg" 
-              className="min-h-12 sm:min-h-14 text-sm sm:text-base" 
+              className="min-h-[48px] shadow-none bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 border" 
               disabled={cart.length === 0} 
               onClick={() => window.print()}
             >
-              <Printer className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              <Printer className="h-5 w-5 mr-2" />
               Print
             </Button>
             <Button 
               variant="secondary" 
               size="lg" 
-              className="min-h-12 sm:min-h-14 text-sm sm:text-base" 
+              className="min-h-[48px] shadow-none bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 border" 
               disabled={cart.length === 0} 
               onClick={downloadReceipt}
             >
-              <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              <Download className="h-5 w-5 mr-2" />
               Download
             </Button>
           </div>
@@ -223,6 +242,7 @@ export function CartPanel({
         totals={totals}
         billNumber={billNumber}
         paymentMethod={paymentMethod}
+        cashierName={cashierName}
       />
     </Card>
   );

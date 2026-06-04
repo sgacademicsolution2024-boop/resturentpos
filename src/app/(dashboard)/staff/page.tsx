@@ -17,15 +17,15 @@ export default function StaffPage() {
   return (
     <RoleGate allowedRoles={["owner"]}>
       <div className="space-y-5">
-        <div className="rounded-[2rem] border border-orange-200/70 bg-white/75 p-5 soft-shadow">
-          <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-700">Team access</p>
-          <h1 className="mt-1 text-3xl font-black text-[#2a1309]">Staff roles</h1>
-          <p className="mt-2 text-base font-semibold text-[#7a3f1d]/70">Owner has full access, manager has operations, cashier has POS only.</p>
+        <div className="flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white shadow-sm border border-slate-200 p-5 soft-shadow">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-500">Team access</p>
+          <h1 className="mt-1 text-3xl font-black text-slate-900">Staff roles</h1>
+          <p className="mt-2 text-base font-semibold text-slate-300/70">Owner has full access, manager has operations, cashier has POS only.</p>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[390px_1fr]">
-          <Card className="overflow-hidden bg-white/85">
-            <CardHeader className="bg-[#2a1309] text-white">
+          <Card className="overflow-hidden bg-white">
+            <CardHeader className="bg-slate-950 text-slate-900">
               <CardTitle className="text-2xl font-black">Invite staff</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -41,19 +41,19 @@ export default function StaffPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/85">
+          <Card className="bg-white">
             <CardHeader>
-              <CardTitle className="text-2xl font-black text-[#2a1309]">Team</CardTitle>
+              <CardTitle className="text-2xl font-black text-slate-900">Team</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-2">
               {staff.map((member) => (
-                <div key={member.email} className="rounded-[1.75rem] border border-orange-200 bg-orange-50/70 p-4">
+                <div key={member.email} className="rounded-[1.75rem] border border-slate-700 bg-slate-900/70 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-lg font-black text-[#2a1309]">{member.name}</p>
-                      <p className="mt-1 text-sm font-semibold text-[#7a3f1d]/70">{member.email}</p>
+                      <p className="text-lg font-black text-slate-900">{member.name}</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-300/70">{member.email}</p>
                     </div>
-                    <span className="inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-orange-700">
+                    <span className="inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-blue-700">
                       <Shield className="h-4 w-4" />
                       {member.role}
                     </span>

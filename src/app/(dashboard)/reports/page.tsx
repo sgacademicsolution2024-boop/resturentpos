@@ -1,155 +1,115 @@
 "use client";
 
-import { useState } from "react";
-import { IndianRupee, Receipt, TrendingUp, Wallet, ArrowDownRight, ArrowUpRight, Calendar } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { SalesChart } from "@/components/dashboard/SalesChart";
-import { expenses, salesTrend } from "@/lib/constants";
 import { money } from "@/lib/utils/billing";
 import { useAuth } from "@/lib/auth-context";
 import { RoleGate } from "@/components/auth/RoleGate";
 import { useSettings } from "@/lib/settings-context";
-import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import { Loader2, Calendar, Wallet, Package, TrendingUp } from "lucide-react";
+
+type DailySales = { sales_date: string; order_count: number; net_sales: number };
+type Expense = { expense_date: string; category: string; amount: number; notes: string };
+type InventoryItem = { name: string; quantity_on_hand: number; unit: string };
+type TopSeller = { name: string; qty: number; total: number };
 
 export default function ReportsPage() {
-  const { isOwner } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
   const { restaurantData } = useSettings();
-  const [timeframe, setTimeframe] = useState("week");
+  const supabase = createClient();
+  const [loading, setLoading] = useState(true);
 
-  // Mock multiplier to simulate dynamic data based on timeframe
-  const multiplier = timeframe === "today" ? 0.14 : timeframe === "week" ? 1 : timeframe === "month" ? 4.3 : 52;
+  const [sales, setSales] = useState<DailySales[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [topSellers, setTopSellers] = useState<TopSeller[]>([]);
 
-  const total = salesTrend.reduce((sum, day) => sum + day.sales, 0) * multiplier;
-  const profit = salesTrend.reduce((sum, day) => sum + day.profit, 0) * multiplier;
-  const orders = Math.floor(salesTrend.reduce((sum, day) => sum + day.orders, 0) * multiplier);
-  const expenseTotal = expenses.reduce((sum, expense) => sum + expense.amount, 0) * (multiplier / 4);
+  useEffect(() => {
+    if (!currentUser?.restaurant_id) return;
+    loadReports();
+  }, [currentUser]);
 
-  const stats = [
-    { label: "Total Revenue", value: money(total, restaurantData.currency), icon: IndianRupee, tone: "from-orange-500 to-red-500", trend: "+12.5%", positive: true },
-    { label: "Total Orders", value: orders.toLocaleString(), icon: Receipt, tone: "from-blue-500 to-indigo-500", trend: "+8.2%", positive: true },
-    { label: "Average Ticket", value: money(total / orders, restaurantData.currency), icon: TrendingUp, tone: "from-emerald-400 to-teal-500", trend: "+2.1%", positive: true },
-  ];
+  async function loadReports() {
+    setLoading(true);
 
-  if (isOwner) {
-    stats.splice(1, 0, 
-      { label: "Gross Profit", value: money(profit, restaurantData.currency), icon: Wallet, tone: "from-yellow-400 to-orange-500", trend: "+14.3%", positive: true },
-      { label: "Total Expenses", value: money(expenseTotal, restaurantData.currency), icon: ArrowDownRight, tone: "from-rose-400 to-red-500", trend: "-1.5%", positive: false }
-    );
+    const [salesRes, expRes, invRes, orderItemsRes] = await Promise.all([
+      supabase.from("daily_sales_summary").select("sales_date, order_count, net_sales").eq("restaurant_id", currentUser?.restaurant_id).order("sales_date", { ascending: false }).limit(30),
+      supabase.from("expenses").select("expense_date, category, amount, notes").eq("restaurant_id", currentUser?.restaurant_id).order("expense_date", { ascending: false }).limit(50),
+      supabase.from("inventory_items").select("name, quantity_on_hand, unit").eq("restaurant_id", currentUser?.restaurant_id).order("name"),
+      supabase.from("order_items").select("item_name, quantity, line_total").eq("restaurant_id", currentUser?.restaurant_id)
+    ]);
+
+    if (salesRes.data) setSales(salesRes.data);
+    if (expRes.data) setExpenses(expRes.data);
+    if (invRes.data) setInventory(invRes.data);
+
+    if (orderItemsRes.data) {
+      const grouped: Record<string, { qty: number, total: number }> = {};
+      orderItemsRes.data.forEach((item: Record<string, unknown>) => {
+        if (!grouped[String(item.item_name)]) {
+          grouped[String(item.item_name)] = { qty: 0, total: 0 };
+        }
+        grouped[String(item.item_name)].qty += Number(item.quantity);
+        grouped[String(item.item_name)].total += Number(item.line_total);
+      });
+
+      const sellers = Object.keys(grouped).map(name => ({
+        name,
+        qty: grouped[name].qty,
+        total: grouped[name].total
+      })).sort((a, b) => b.qty - a.qty).slice(0, 10);
+
+      setTopSellers(sellers);
+    }
+
+    setLoading(false);
   }
 
-  const timeframes = [
-    { id: "today", label: "Today" },
-    { id: "week", label: "7 Days" },
-    { id: "month", label: "This Month" },
-    { id: "year", label: "This Year" },
-  ];
+  if (loading) {
+    return <div className="flex h-96 items-center justify-center"><Loader2 className="h-10 w-10 animate-spin text-blue-500" /></div>;
+  }
 
   return (
-    <RoleGate allowedRoles={["owner", "manager"]}>
+    <RoleGate allowedRoles={["admin", "manager"]}>
       <div className="space-y-6">
         
         {/* Header Section */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-[2rem] border border-orange-200/70 bg-white/75 p-5 soft-shadow">
+        <div className="flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white shadow-sm border border-slate-200 p-5 soft-shadow">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-700">Analytics</p>
-            <h1 className="mt-1 text-3xl font-black text-[#2a1309]">Sales & Performance</h1>
-            <p className="mt-2 text-sm font-semibold text-[#7a3f1d]/70">Monitor your restaurant&apos;s financial pulse in real-time.</p>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-500">Analytics</p>
+            <h1 className="mt-1 text-3xl font-black text-slate-900">Restaurant Reports</h1>
+            <p className="mt-2 text-sm font-semibold text-slate-500">Simple, live data tables for sales, expenses, and inventory.</p>
           </div>
-          
-          <div className="flex items-center gap-1 rounded-2xl bg-orange-100/50 p-1 border border-orange-200">
-            {timeframes.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTimeframe(t.id)}
-                className={cn(
-                  "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300",
-                  timeframe === t.id 
-                    ? "bg-white text-orange-700 shadow-sm" 
-                    : "text-[#7a3f1d]/60 hover:text-[#7a3f1d] hover:bg-orange-50"
-                )}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Dynamic Metric Cards */}
-        <div className={cn("grid gap-4", isOwner ? "md:grid-cols-5" : "md:grid-cols-3")}>
-          {stats.map((stat, i) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={i} className="overflow-hidden bg-white/85 border-transparent shadow-sm hover:shadow-md transition-shadow duration-300">
-                <CardContent className="p-5">
-                  <div className="flex justify-between items-start">
-                    <div className={cn(
-                      "flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br shadow-inner",
-                      stat.tone
-                    )}>
-                      <Icon className="h-6 w-6 text-white" />
-                    </div>
-                    <div className={cn(
-                      "flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full",
-                      stat.positive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                    )}>
-                      {stat.positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                      {stat.trend}
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-sm font-black uppercase tracking-[0.14em] text-[#7a3f1d]/70">{stat.label}</p>
-                    <p className="mt-1 text-2xl font-black text-[#2a1309] truncate">{stat.value}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Chart Section */}
-        <div className="rounded-[2rem] bg-white/85 p-2 shadow-sm border border-orange-100/50">
-          <SalesChart />
         </div>
 
         {/* Data Tables */}
         <div className="grid gap-6 xl:grid-cols-2">
           
           {/* Daily Sales Table */}
-          <Card className="bg-white/85 overflow-hidden border-orange-200/50">
-            <CardHeader className="bg-orange-50/50 border-b border-orange-100">
-              <CardTitle className="flex items-center gap-2 text-xl font-black text-[#2a1309]">
-                <Calendar className="h-5 w-5 text-orange-500" />
-                {isOwner ? "Daily Revenue & Profit" : "Daily Revenue Breakdown"}
+          <Card className="bg-white shadow-sm border border-slate-200 border-slate-200 bg-white shadow-none overflow-hidden">
+            <CardHeader className="bg-slate-50 border-b border-slate-200 backdrop-blur-md">
+              <CardTitle className="flex items-center gap-2 text-xl font-black text-slate-900">
+                <Calendar className="h-5 w-5 text-blue-500" />
+                Daily Sales
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto min-w-0">
+              <div className="overflow-x-auto min-w-0 max-h-96">
                 <table className="w-full text-left text-sm whitespace-nowrap">
-                  <thead className="bg-white text-[#7a3f1d]/80 uppercase tracking-wider text-[10px] font-black">
+                  <thead className="bg-slate-100 text-blue-500 border-b border-slate-200 uppercase tracking-wider text-[10px] font-black sticky top-0 shadow-sm">
                     <tr>
                       <th className="px-6 py-4">Date</th>
                       <th className="px-6 py-4">Orders</th>
-                      <th className="px-6 py-4">Revenue</th>
-                      {isOwner && <th className="px-6 py-4">Profit</th>}
-                      {isOwner && <th className="px-6 py-4">Margin</th>}
+                      <th className="px-6 py-4">Net Revenue</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-orange-100">
-                    {salesTrend.map((day) => (
-                      <tr key={day.day} className="transition-colors hover:bg-orange-50/50 group">
-                        <td className="px-6 py-4 font-bold text-[#2a1309] group-hover:text-orange-700 transition-colors">{day.day}</td>
-                        <td className="px-6 py-4 font-bold text-[#7a3f1d]/80">{day.orders}</td>
-                        <td className="px-6 py-4 font-black text-[#2a1309]">{money(day.sales, restaurantData.currency)}</td>
-                        {isOwner && (
-                          <td className="px-6 py-4 font-black text-green-700">{money(day.profit, restaurantData.currency)}</td>
-                        )}
-                        {isOwner && (
-                          <td className="px-6 py-4">
-                            <span className="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-1 rounded-full">
-                              {((day.profit / day.sales) * 100).toFixed(1)}%
-                            </span>
-                          </td>
-                        )}
+                  <tbody className="divide-y divide-white/10">
+                    {sales.map((day, idx) => (
+                      <tr key={idx} className="transition-colors hover:bg-white">
+                        <td className="px-6 py-4 font-bold text-slate-900">{new Date(day.sales_date).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 font-bold text-slate-600">{day.order_count}</td>
+                        <td className="px-6 py-4 font-black text-slate-900">{money(day.net_sales, restaurantData.currency)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -158,37 +118,97 @@ export default function ReportsPage() {
             </CardContent>
           </Card>
 
-          {/* Expenses Table (Owner Only) */}
-          {isOwner && (
-            <Card className="bg-white/85 overflow-hidden border-orange-200/50">
-              <CardHeader className="bg-orange-50/50 border-b border-orange-100">
-                <CardTitle className="flex items-center gap-2 text-xl font-black text-[#2a1309]">
+          {/* Top Sellers Table */}
+          <Card className="bg-white shadow-sm border border-slate-200 border-slate-200 bg-white shadow-none overflow-hidden">
+            <CardHeader className="bg-slate-50 border-b border-slate-200 backdrop-blur-md">
+              <CardTitle className="flex items-center gap-2 text-xl font-black text-slate-900">
+                <TrendingUp className="h-5 w-5 text-green-500" />
+                Top Selling Items
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto min-w-0 max-h-96">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-100 text-blue-500 border-b border-slate-200 uppercase tracking-wider text-[10px] font-black sticky top-0 shadow-sm">
+                    <tr>
+                      <th className="px-6 py-4">Item Name</th>
+                      <th className="px-6 py-4">Qty Sold</th>
+                      <th className="px-6 py-4">Total Value</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {topSellers.map((item, idx) => (
+                      <tr key={idx} className="transition-colors hover:bg-white">
+                        <td className="px-6 py-4 font-bold text-slate-900">{item.name}</td>
+                        <td className="px-6 py-4 font-bold text-slate-600">{item.qty}</td>
+                        <td className="px-6 py-4 font-black text-slate-900">{money(item.total, restaurantData.currency)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Inventory Levels Table */}
+          <Card className="bg-white shadow-sm border border-slate-200 border-slate-200 bg-white shadow-none overflow-hidden">
+            <CardHeader className="bg-slate-50 border-b border-slate-200 backdrop-blur-md">
+              <CardTitle className="flex items-center gap-2 text-xl font-black text-slate-900">
+                <Package className="h-5 w-5 text-blue-500" />
+                Inventory Stock
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto min-w-0 max-h-96">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-100 text-blue-500 border-b border-slate-200 uppercase tracking-wider text-[10px] font-black sticky top-0 shadow-sm">
+                    <tr>
+                      <th className="px-6 py-4">Ingredient</th>
+                      <th className="px-6 py-4 text-right">Quantity on Hand</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {inventory.map((item, idx) => (
+                      <tr key={idx} className="transition-colors hover:bg-white">
+                        <td className="px-6 py-4 font-bold text-slate-900">{item.name}</td>
+                        <td className="px-6 py-4 font-bold text-slate-600 text-right">{item.quantity_on_hand} {item.unit}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Expenses Table (Admin Only) */}
+          {isAdmin && (
+            <Card className="bg-white shadow-sm border border-slate-200 border-slate-200 bg-white shadow-none overflow-hidden">
+              <CardHeader className="bg-slate-50 border-b border-slate-200 backdrop-blur-md">
+                <CardTitle className="flex items-center gap-2 text-xl font-black text-slate-900">
                   <Wallet className="h-5 w-5 text-red-500" />
                   Recent Expenses
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="overflow-x-auto min-w-0">
+                <div className="overflow-x-auto min-w-0 max-h-96">
                   <table className="w-full text-left text-sm whitespace-nowrap">
-                    <thead className="bg-white text-[#7a3f1d]/80 uppercase tracking-wider text-[10px] font-black">
+                    <thead className="bg-slate-100 text-blue-500 border-b border-slate-200 uppercase tracking-wider text-[10px] font-black sticky top-0 shadow-sm">
                       <tr>
-                        <th className="px-6 py-4">Expense Item</th>
-                        <th className="px-6 py-4">Category</th>
                         <th className="px-6 py-4">Date</th>
-                        <th className="px-6 py-4 text-right">Amount</th>
+                        <th className="px-6 py-4">Category</th>
+                        <th className="px-6 py-4">Amount</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-orange-100">
-                      {expenses.map((expense) => (
-                        <tr key={expense.id} className="transition-colors hover:bg-orange-50/50 group">
-                          <td className="px-6 py-4 font-bold text-[#2a1309] group-hover:text-orange-700 transition-colors">{expense.name}</td>
+                    <tbody className="divide-y divide-white/10">
+                      {expenses.map((expense, idx) => (
+                        <tr key={idx} className="transition-colors hover:bg-white">
+                          <td className="px-6 py-4 font-bold text-slate-500">{new Date(expense.expense_date).toLocaleDateString()}</td>
                           <td className="px-6 py-4">
-                            <span className="bg-orange-100 text-[#7a3f1d] text-[10px] uppercase tracking-wider font-black px-3 py-1 rounded-full">
+                            <span className="bg-blue-500/20 text-blue-500 border border-blue-500/20 text-[10px] uppercase tracking-wider font-black px-3 py-1 rounded-full">
                               {expense.category}
                             </span>
                           </td>
-                          <td className="px-6 py-4 font-bold text-[#7a3f1d]/70">{expense.expenseDate}</td>
-                          <td className="px-6 py-4 font-black text-red-600 text-right">
+                          <td className="px-6 py-4 font-black text-red-400">
                             {money(expense.amount, restaurantData.currency)}
                           </td>
                         </tr>

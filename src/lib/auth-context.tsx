@@ -1,47 +1,100 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-export type Role = "owner" | "manager" | "cashier";
+export type Role = "admin" | "manager";
 
 export interface User {
-  name: string;
+  id: string;
+  full_name: string;
   role: Role;
+  restaurant_id: string;
 }
 
 interface AuthContextType {
-  currentUser: User;
-  role: Role;
-  setRole: (role: Role) => void;
-  isOwner: boolean;
+  currentUser: User | null;
+  role: Role | null;
+  isAdmin: boolean;
   isManager: boolean;
-  isCashier: boolean;
+  isLoading: boolean;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // DEV ONLY role switcher state. 
-  // Replace with Supabase profiles.role after auth integration.
-  const [role, setRole] = useState<Role>("owner");
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClient();
 
-  const users: Record<Role, User> = {
-    owner: { name: "Bapi", role: "owner" },
-    manager: { name: "Restaurant Manager", role: "manager" },
-    cashier: { name: "Ayesha", role: "cashier" }
+  useEffect(() => {
+    const fetchSessionAndProfile = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+
+          if (profile) {
+            setCurrentUser(profile as User);
+          } else {
+            setCurrentUser(null);
+          }
+        } else {
+          setCurrentUser(null);
+        }
+      } catch (error) {
+        console.error("Error fetching session:", error);
+        setCurrentUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSessionAndProfile();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+          
+        if (profile) {
+          setCurrentUser(profile as User);
+        } else {
+          setCurrentUser(null);
+        }
+      } else {
+        setCurrentUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setCurrentUser(null);
   };
-
-  const currentUser = users[role];
 
   return (
     <AuthContext.Provider
       value={{
         currentUser,
-        role,
-        setRole,
-        isOwner: role === "owner",
-        isManager: role === "manager",
-        isCashier: role === "cashier"
+        role: currentUser?.role || null,
+        isAdmin: currentUser?.role === "admin",
+        isManager: currentUser?.role === "manager",
+        isLoading,
+        signOut
       }}
     >
       {children}

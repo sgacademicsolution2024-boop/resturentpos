@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
 import type { CartItem, PaymentMethod } from "@/lib/types";
 import { money } from "@/lib/utils/billing";
-import { cashier } from "@/lib/constants";
 import { useSettings } from "@/lib/settings-context";
 
 type BillReceiptProps = {
@@ -10,10 +9,11 @@ type BillReceiptProps = {
   totals: { subtotal: number; tax: number; total: number };
   billNumber: string;
   paymentMethod: PaymentMethod;
+  cashierName: string;
 };
 
 export const BillReceipt = forwardRef<HTMLDivElement, BillReceiptProps>(
-  ({ cart, discount, totals, billNumber, paymentMethod }, ref) => {
+  ({ cart, discount, totals, billNumber, paymentMethod, cashierName }, ref) => {
     const { restaurantData } = useSettings();
     const date = new Date();
 
@@ -21,7 +21,8 @@ export const BillReceipt = forwardRef<HTMLDivElement, BillReceiptProps>(
       <div
         ref={ref}
         id="bill-receipt"
-        className="fixed -left-[9999px] top-0 w-[300px] bg-white p-4 font-mono text-sm text-black print:static print:w-full print:block"
+        suppressHydrationWarning
+        className="fixed -left-[9999px] top-0 w-[300px] bg-black/40 p-4 font-mono text-sm text-black print:static print:w-full print:block"
       >
         <div className="text-center mb-4">
           <h1 className="text-xl font-bold uppercase">{restaurantData.name}</h1>
@@ -46,7 +47,7 @@ export const BillReceipt = forwardRef<HTMLDivElement, BillReceiptProps>(
           </div>
           <div className="flex justify-between">
             <span>Cashier:</span>
-            <span>{cashier.name}</span>
+            <span>{cashierName}</span>
           </div>
         </div>
 

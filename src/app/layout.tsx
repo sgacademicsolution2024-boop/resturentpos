@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { Outfit } from "next/font/google";
 import { AuthProvider } from "@/lib/auth-context";
 import { SettingsProvider } from "@/lib/settings-context";
 import "./globals.css";
+
+const outfit = Outfit({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Gaan Fun Khaan POS",
@@ -15,10 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <SettingsProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </SettingsProvider>
+      <body className={outfit.className}>
+        <AuthProvider>
+          <SettingsProvider>{children}</SettingsProvider>
+        </AuthProvider>
       </body>
     </html>
   );

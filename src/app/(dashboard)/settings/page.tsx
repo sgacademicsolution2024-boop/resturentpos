@@ -24,16 +24,16 @@ export default function SettingsPage() {
   };
 
   return (
-    <RoleGate allowedRoles={["owner", "manager"]}>
+    <RoleGate allowedRoles={["admin", "manager"]}>
       <div className="space-y-5">
-        <div className="rounded-[2rem] border border-orange-200/70 bg-white/75 p-5 soft-shadow">
-          <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-700">Restaurant profile</p>
-          <h1 className="mt-1 text-3xl font-black text-[#2a1309]">Settings</h1>
-          <p className="mt-2 text-base font-semibold text-[#7a3f1d]/70">Bill headers, tax, currency, and basic business details.</p>
+        <div className="flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white shadow-sm border border-slate-200 p-5 soft-shadow">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-500">Restaurant profile</p>
+          <h1 className="mt-1 text-3xl font-black text-slate-900">Settings</h1>
+          <p className="mt-2 text-base font-semibold text-slate-300/70">Bill headers, tax, currency, and basic business details.</p>
         </div>
 
-        <Card className="max-w-4xl overflow-hidden bg-white/85">
-          <CardHeader className="bg-[#2a1309] text-white">
+        <Card className="max-w-4xl overflow-hidden bg-white">
+          <CardHeader className="bg-slate-950 text-slate-900">
             <CardTitle className="text-2xl font-black">Business profile</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

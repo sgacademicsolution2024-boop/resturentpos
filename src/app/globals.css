@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --background: 34 86% 94%;
-  --foreground: 22 36% 12%;
-  --card: 38 100% 98%;
-  --card-foreground: 22 36% 12%;
-  --primary: 18 91% 50%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 42 96% 88%;
-  --secondary-foreground: 24 54% 18%;
-  --muted: 33 56% 89%;
-  --muted-foreground: 23 18% 38%;
-  --accent: 42 96% 55%;
-  --accent-foreground: 22 36% 12%;
-  --destructive: 0 78% 48%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 28 52% 80%;
-  --input: 28 52% 80%;
-  --ring: 18 91% 50%;
+  --background: 210 40% 98%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
   --radius: 1.25rem;
 }
 
@@ -28,28 +28,19 @@
 }
 
 body {
-  @apply bg-background text-foreground antialiased;
-  background:
-    radial-gradient(circle at top left, rgba(255, 193, 7, 0.38), transparent 30rem),
-    radial-gradient(circle at top right, rgba(239, 68, 68, 0.18), transparent 28rem),
-    linear-gradient(135deg, #fff7dc 0%, #ffe5bd 45%, #fff3e0 100%);
+  @apply bg-slate-50 text-slate-900 antialiased;
 }
 
 ::selection {
   background: hsl(var(--primary) / 0.18);
 }
 
-.glass-panel {
-  background: rgba(255, 251, 235, 0.82);
-  backdrop-filter: blur(18px);
-}
-
 .soft-shadow {
-  box-shadow: 0 24px 60px rgba(83, 35, 8, 0.14);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
 .food-card-shadow {
-  box-shadow: 0 18px 35px rgba(194, 65, 12, 0.16);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 @media print {

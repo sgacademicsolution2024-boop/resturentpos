@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { AlertCircle, ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth, Role } from "@/lib/auth-context";
 
@@ -14,15 +14,29 @@ interface RoleGateProps {
 }
 
 export function RoleGate({ allowedRoles, children, fallback, redirectTo }: RoleGateProps) {
-  const { role } = useAuth();
+  const { role, isLoading, currentUser } = useAuth();
   const router = useRouter();
-  const isAllowed = allowedRoles.includes(role);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    if (!isAllowed && redirectTo) {
+    setHasMounted(true);
+  }, []);
+
+  const isAllowed = role !== null && allowedRoles.includes(role);
+
+  useEffect(() => {
+    if (!isLoading && hasMounted && !isAllowed && redirectTo) {
       router.replace(redirectTo);
     }
-  }, [isAllowed, redirectTo, router]);
+  }, [isLoading, isAllowed, redirectTo, router, hasMounted]);
+
+  if (!hasMounted || isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center p-4">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   if (isAllowed) {
     return <>{children}</>;
@@ -36,20 +50,21 @@ export function RoleGate({ allowedRoles, children, fallback, redirectTo }: RoleG
     return <>{fallback}</>;
   }
 
+  // Not allowed default view
   return (
     <div className="flex min-h-[60vh] items-center justify-center p-4">
-      <div className="w-full max-w-md overflow-hidden rounded-[2rem] border border-red-200 bg-white/85 p-8 text-center shadow-xl backdrop-blur-sm">
+      <div className="w-full max-w-md overflow-hidden rounded-[2rem] border border-red-200 bg-white/5 p-8 text-center shadow-xl backdrop-blur-sm">
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-red-100 text-red-600 shadow-sm">
           <AlertCircle className="h-10 w-10" />
         </div>
-        <h2 className="mt-6 text-2xl font-black text-[#2a1309]">Access Restricted</h2>
-        <p className="mt-2 text-base font-semibold text-[#7a3f1d]/70">
-          Only the restaurant owner can view this section.
+        <h2 className="mt-6 text-2xl font-black text-white">Access Restricted</h2>
+        <p className="mt-2 text-base font-semibold text-slate-300/70">
+          You do not have permission to view this section.
         </p>
         <div className="mt-8">
-          <Button size="lg" className="w-full" onClick={() => router.push(role === "cashier" ? "/pos" : "/dashboard")}>
+          <Button size="lg" className="w-full" onClick={() => router.push(currentUser ? "/dashboard" : "/login")}>
             <ArrowLeft className="mr-2 h-5 w-5" />
-            Back to {role === "cashier" ? "POS" : "Dashboard"}
+            Back to {currentUser ? "Dashboard" : "Login"}
           </Button>
         </div>
       </div>

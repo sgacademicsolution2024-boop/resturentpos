@@ -5,18 +5,19 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
+import { BottomNav } from "@/components/layout/BottomNav";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-orange-50/30">
-      <div className="fixed inset-y-0 left-0 z-40 hidden lg:block">
+    <div className="min-h-screen overflow-x-hidden text-slate-900 bg-slate-50">
+      <div className="fixed inset-y-0 left-0 z-40 hidden md:block">
         <Sidebar />
       </div>
 
       {open ? (
-        <div className="fixed inset-0 z-50 bg-black/45 lg:hidden">
+        <div className="fixed inset-0 z-50 bg-black/60 md:hidden">
           <div className="relative h-full w-[240px]">
             <Sidebar onNavigate={() => setOpen(false)} />
             <Button
@@ -33,9 +34,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       ) : null}
 
       <Topbar onMenuClick={() => setOpen(true)} />
-      <main className="lg:ml-[240px] min-w-0 w-full max-w-full">
+      <main className="md:ml-[240px] min-w-0 w-full max-w-full pb-24 md:pb-0">
         <div className="mx-auto max-w-[1600px] p-4 md:p-6 lg:p-8 min-w-0 w-full max-w-full">{children}</div>
       </main>
+      <BottomNav />
     </div>
   );
 }
